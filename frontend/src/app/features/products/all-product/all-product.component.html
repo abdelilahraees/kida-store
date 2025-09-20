@@ -1,0 +1,200 @@
+<section class="py-16">
+  <div class="container mx-auto px-4">
+    <div class="flex justify-between items-center mb-12">
+      <h2 class="text-3xl font-bold">Featured Products</h2>
+      <div class="flex space-x-1 px-1 py-1 bg-primary rounded-full">
+        <button (click)="getProductsByCategory(0)" [ngClass]="{'bg-white':selectedCategoryId==0}"
+          class="px-4 py-1.5  text-gray-950 rounded-full shadow-sm text-sm font-medium whitespace-nowrap"
+        >
+          All
+        </button>
+
+        <ng-container *ngFor="let c of categories">
+
+          <button (click)="getProductsByCategory(c.id)" [ngClass]="{'bg-white':selectedCategoryId==c.id}"
+            class="px-4 py-1.5 text-gray-950  rounded-full text-sm font-medium  hover:shadow-sm transition whitespace-nowrap"
+          >
+
+            {{c.name}}
+          </button>
+        </ng-container>
+
+
+      </div>
+    </div>
+
+    <ng-container *ngIf="state$| async as response">
+      <div *ngIf="response.loading" class="group">
+        <div class="relative overflow-hidden rounded-lg mb-4">
+              <span
+                class="absolute top-3 left-3 bg-primary text-white text-xs px-2 py-1 rounded"
+              >New</span
+              >
+          <img
+            src="https://readdy.ai/api/search-image?query=elegant%20white%20blouse%20on%20minimal%20light%20background%2C%20professional%20fashion%20photography%2C%20high%20quality%20product%20image%2C%20detailed%20fabric%20texture&width=500&height=600&seq=prod4&orientation=portrait"
+            alt="White Blouse"
+            class="w-full h-80 object-cover object-top"
+          />
+          <div
+            class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+          >
+            <button
+              class="bg-white text-gray-900 w-10 h-10 rounded-full flex items-center justify-center shadow-md mx-1 hover:bg-gray-100 transition"
+            >
+              <i class="ri-eye-line"></i>
+            </button>
+            <button
+              class="bg-white text-gray-900 w-10 h-10 rounded-full flex items-center justify-center shadow-md mx-1 hover:bg-gray-100 transition"
+            >
+              <i class="ri-heart-line"></i>
+            </button>
+
+            <i class="ri-shopping-bag-line"></i>
+
+          </div>
+        </div>
+        <div>
+          <h3 class="font-medium text-gray-900 mb-1">
+            pleas with
+          </h3>
+          <div class="flex items-center mb-1">
+            <div class="flex text-amber-400 text-sm">
+              <i class="ri-star-fill"></i>
+              <i class="ri-star-fill"></i>
+              <i class="ri-star-fill"></i>
+              <i class="ri-star-fill"></i>
+              <i class="ri-star-half-fill"></i>
+            </div>
+            <span class="text-xs text-gray-500 ml-1">(42)</span>
+          </div>
+          <p class="text-gray-900 font-medium">...</p>
+        </div>
+      </div>
+
+
+      <div *ngIf="response.data" class="flex grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        @for (product of response.data.content; track product.id) {
+
+
+          <div *ngIf="isModalOpen" class="fixed inset-0 bg-primary-600 flex items-center justify-center z-50 transition-opacity duration-300">
+
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-lg relative" (click)="$event.stopPropagation()">
+              <button (click)="closeModal()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600">
+                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+              </button>
+
+              <div *ngIf="selectedProduct">
+                <div class="p-6">
+                  <h2 class="text-2xl font-bold mb-4">{{ selectedProduct.name }}</h2>
+                  <img [src]="selectedProduct.imageUrl" alt="{{ selectedProduct.name }}" class="w-full h-64 object-cover rounded-md mb-4">
+                  <p class="text-gray-700 mb-4">{{ selectedProduct.description }}</p>
+                  <p class="text-xl font-semibold">{{ selectedProduct.price | currency:'USD' }}</p>
+                </div>
+
+                <div class="bg-gray-50 px-6 py-4 flex justify-end space-x-3 rounded-b-lg">
+                  <button (click)="closeModal()"
+                          class="bg-white text-gray-700 font-semibold py-2 px-4 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                    Annuler
+                  </button>
+                  <button (click)="addToCart(product.id)"
+                          class="bg-primary text-white font-semibold py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                    Ajouter au panier
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="group">
+            <div class="relative overflow-hidden rounded-lg mb-4">
+              <span
+                class="absolute top-3 left-3 bg-primary text-white text-xs px-2 py-1 rounded"
+              >New</span
+              >
+              <img
+                [src]="product.imageUrl"
+                alt="White Blouse"
+                class="w-full h-80 object-cover object-top"
+              />
+              <div
+                class="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+              >
+                <button (click)="openModal(product)"
+                  class="bg-white text-gray-900 w-10 h-10 rounded-full flex items-center justify-center shadow-md mx-1 hover:bg-gray-100 transition"
+                >
+                  <i class="ri-eye-line"></i>
+                </button>
+                <button
+                  class="bg-white text-gray-900 w-10 h-10 rounded-full flex items-center justify-center shadow-md mx-1 hover:bg-gray-100 transition"
+                >
+                  <i class="ri-heart-line"></i>
+                </button>
+                <button (click)="addToCart(product.id)"
+                        class="bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center shadow-md mx-1 hover:bg-primary/90 transition"
+                >
+                  <i class="ri-shopping-bag-line"></i>
+                </button>
+              </div>
+            </div>
+            <div>
+              <h3 class="font-medium text-gray-900 mb-1">
+                {{ product.name }}
+              </h3>
+              <div class="flex items-center mb-1">
+                <div class="flex text-amber-400 text-sm">
+                  <i class="ri-star-fill"></i>
+                  <i class="ri-star-fill"></i>
+                  <i class="ri-star-fill"></i>
+                  <i class="ri-star-fill"></i>
+                  <i class="ri-star-half-fill"></i>
+                </div>
+                <span class="text-xs text-gray-500 ml-1">(42)</span>
+              </div>
+              <p class="text-gray-900 font-medium">${{ product.price }}</p>
+            </div>
+          </div>
+
+
+        }
+
+
+      </div>
+    </ng-container>
+
+  </div>
+</section>
+<ng-container *ngIf="state$| async as response">
+
+  <div *ngIf="response.data" class=" flex justify-center  ml-24 text-center m-6">
+    <ul class="inline-flex mt-2 border-gray-950">
+      <li>
+        <button (click)="previousPage()" [hidden]="!response.data.hasPreviousPage"
+                [ngClass]="response.data.pageNumber==1?'':'text-indigo-600'"
+                class="h-8 px-5  font-bold transition-colors duration-150 bg-white border border-r-0 border-gray-500 rounded-l-lg focus:shadow-outline hover:bg-indigo-100">
+          First
+        </button>
+      </li>
+      <li>
+        <button
+          class="h-8 px-5 text-indigo-600 font-bold transition-colors duration-150 bg-white border border-r-0 border-gray-500 focus:shadow-outline hover:bg-indigo-100">{{ response.data.pageNumber }}
+        </button>
+        <button *ngIf="response.data.totalPages!=response.data.pageNumber"
+                class="h-8 px-5 text-indigo-600 font-bold transition-colors duration-150 bg-white border border-r-0 border-gray-500 focus:shadow-outline hover:bg-indigo-100">
+          ...
+        </button>
+        <button *ngIf="response.data.totalPages!=response.data.pageNumber"
+                class="h-8 px-5 text-indigo-600 font-bold transition-colors duration-150 bg-white border border-r-0 border-gray-500 focus:shadow-outline hover:bg-indigo-100">{{ response.data.totalPages }}
+        </button>
+      </li>
+
+      <li>
+        <button (click)="nextPage()" [disabled]="!response.data.hasNextPage"
+                [ngClass]="response.data.hasNextPage?'text-indigo-600':''"
+                class="h-8 px-5 font-bold transition-colors duration-150 bg-white border border-gray-500 rounded-r-lg focus:shadow-outline hover:bg-indigo-100">
+          Next
+        </button>
+      </li>
+    </ul>
+
+  </div>
+</ng-container>

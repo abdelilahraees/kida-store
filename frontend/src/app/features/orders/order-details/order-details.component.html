@@ -1,0 +1,102 @@
+<div *ngIf="order" class="bg-gray-50 font-sans p-4 sm:p-6 lg:p-8">
+  <div class="max-w-4xl mx-auto">
+
+    <div class="bg-white p-6 rounded-lg shadow-sm mb-6">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-gray-800">
+            Détails de la commande #{{ order.id }}
+          </h1>
+          <p class="text-sm text-gray-500 mt-1">
+            Passée le {{ order.createdAt | date: 'dd MMMM yyyy' }}
+          </p>
+        </div>
+        <button
+          (click)="openModal()"
+          class="mt-4 sm:mt-0 px-3 py-1 rounded-full text-sm font-semibold"
+          [ngClass]="{
+            'bg-green-100 text-green-800': order.state === 'Confirmed',
+            'bg-yellow-100 text-yellow-800': order.state === 'Pending',
+            'bg-blue-100 text-blue-800': order.state === 'Processing',
+            'bg-red-100 text-blue-800': order.state === 'Cancelled',
+            'bg-red-600 text-gray-100': order.state === 'Returned',
+            'bg-primary text-gray-100': order.state === 'Delivered',
+          }"
+        >
+          {{ order.state }}
+        </button>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+      <div class="lg:col-span-2 bg-white p-6 rounded-lg shadow-sm">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">Produits commandés</h2>
+
+        <div *ngFor="let item of order.orderItems; let last = last">
+          <div class="flex items-center space-x-4 py-4">
+            <img [src]="item?.product?.imageUrl" alt="{{ item?.product?.name }}"
+                 class="w-16 h-16 object-cover rounded-md">
+            <div class="flex-grow">
+              <h3 class="font-semibold text-gray-800">{{ item?.product?.name }}</h3>
+              <p class="text-sm text-gray-500">Quantité : {{ item.quantity }}</p>
+            </div>
+            <div class="flex-grow">
+              <h3 class="font-semibold text-gray-800">Unite Price {{ item?.product?.price|currency:'EUR' }}</h3>
+            </div>
+            <div class="text-right font-semibold text-gray-800">
+             Total  {{ calcTotalItem(item?.product?.price, item.quantity)| currency: 'EUR' }}
+            </div>
+          </div>
+          <hr *ngIf="!last">
+        </div>
+      </div>
+
+      <div class="lg:col-span-1 space-y-6">
+
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">Résumé</h2>
+          <div class="space-y-3">
+            <div class="flex justify-between text-gray-600">
+              <span>Sous-total</span>
+              <span>{{ order.total | currency: 'EUR' }}</span>
+            </div>
+            <div class="flex justify-between text-gray-600">
+              <span>Frais de livraison</span>
+              <span>{{ 0 | currency: 'EUR' }}</span>
+            </div>
+            <hr>
+            <div class="flex justify-between font-bold text-gray-800 text-lg">
+              <span>Total</span>
+              <span>{{ order.total | currency: 'EUR' }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow-sm">
+          <h2 class="text-lg font-semibold text-gray-800 mb-4">Adresse de livraison</h2>
+          <address class="text-gray-600 not-italic">
+            <p class="font-semibold">{{ order.address?.country }}</p>
+            <p>{{ order.address?.street }}</p>
+            <p>{{ order.address?.city }}, {{ order.address?.postCode }}</p>
+            <p>House Number : {{ order.address?.houseNumber }}</p>
+          </address>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div *ngIf="!order" class="text-center p-8">
+  <p>Chargement des détails de la commande...</p>
+</div>
+<app-update-order
+  *ngIf="isModalOpen"
+  [orderId]="order.id"
+  [currentStatus]="order.state"
+  (close)="closeModal()"
+  (save)="handleStatusSave($event)">
+
+</app-update-order>

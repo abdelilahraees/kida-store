@@ -1,0 +1,12 @@
+
+.footer-toolbar {
+  border-radius: 0;
+  padding: 1rem 2rem;
+  background-color: #121212;
+  color: #ffffff;
+position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+}

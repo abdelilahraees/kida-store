@@ -1,0 +1,242 @@
+<div *ngIf="!initialState.loading" class="loading-spinner">
+  Chargement en cours...
+
+</div>
+
+<ng-container *ngIf="state$|async as products">
+
+  <div class="w-full  flex items-center justify-center min-h-full p-2 h-full">
+    <div class="container max-w-6xl">
+      <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <!-- Table Header -->
+        <div class="p-6 border-b border-gray-200">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 class="text-xl font-bold text-gray-800">All Products</h2>
+              <p class="text-gray-500 mt-1">Manage your Products her</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+              <a routerLink="/admin/add-product"
+                 class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-lg transition duration-150 ease-in-out">
+                Add Product
+              </a>
+            </div>
+          </div>
+
+
+          <!-- Search and Filter -->
+          <div class="mt-6 flex flex-col sm:flex-row gap-4 ">
+            <div class="relative flex-grow">
+              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                     fill="currentColor" aria-hidden="true">
+                  <path fill-rule="evenodd"
+                        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                        clip-rule="evenodd"/>
+                </svg>
+              </div>
+              <input type="text" class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg w-full "
+                     placeholder="Search members...">
+            </div>
+            <div>
+              <select (change)="getProductsByCategory(categoryId?.value)"
+                      class="border border-gray-300 rounded-lg px-4 py-2 w-full sm:w-auto"
+                      #categoryId>
+                <option value="0">All Categories</option>
+                <ng-container *ngFor="let category of categories">
+                  <option [value]="category.id">{{ category.name }}</option>
+                </ng-container>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto" [ngClass]="{'min-h-[80vh]':products?.data?.content?.length==1}">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Name
+              </th>
+
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Category
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Price
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Quantity Stock
+              </th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+
+
+            <ng-container *ngIf="products.data">
+
+              <tr *ngFor="let product of products.data?.content"
+                  class="hover:bg-gray-50 transition-colors duration-150">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <div class="h-10 w-10 flex-shrink-0">
+                      <img class="h-10 w-10 rounded-full object-cover"
+                           [src]="product.imageUrl"
+                           alt="">
+                    </div>
+                    <div class="ml-4">
+                      <div class="text-sm font-medium text-gray-900">{{ product.name }}</div>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ product.category?.name }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="text-sm text-gray-900">{{ product.price }}</div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                  {{ product.quantityStock }}
+                </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <a [routerLink]="['/admin/edit-product',product.id]"
+                     class="text-indigo-600 hover:text-indigo-900 mr-3">Edit</a>
+                  <button (click)="openModal(product?.name)" class="text-red-600 hover:text-red-900">Delete</button>
+                </td>
+                <!--              Modal -->
+                <ng-container *ngIf="isModalOpen">
+                  <div
+                    class="fixed inset-0 z-40 min-h-full overflow-y-auto overflow-x-hidden transition flex items-center">
+                    <!-- overlay -->
+                    <div aria-hidden="true" class="fixed inset-0 w-full h-full bg-black/50 cursor-pointer">
+                    </div>
+
+                    <!-- Modal -->
+                    <div class="relative w-full cursor-pointer pointer-events-none transition my-auto p-4">
+                      <div
+                        class="w-full py-2 bg-white cursor-default pointer-events-auto dark:bg-gray-800 relative rounded-xl mx-auto max-w-sm">
+
+                        <button tabindex="-1" (click)="closeModal()" type="button"
+                                class="absolute top-2 right-2 rtl:right-auto rtl:left-2">
+                          <svg title="Close" tabindex="-1" class="h-4 w-4 cursor-pointer text-gray-400"
+                               xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                               aria-hidden="true">
+                            <path fill-rule="evenodd"
+                                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                  clip-rule="evenodd"></path>
+                          </svg>
+                          <span class="sr-only">
+                    Close
+                </span>
+                        </button>
+
+
+                        <div class="space-y-2 p-2">
+                          <div class="p-4 space-y-2 text-center dark:text-white">
+                            <h2 class="text-xl font-bold tracking-tight" id="page-action.heading">
+                              Delete Product {{ productNameToDelete }} </h2>
+
+                            <p class="text-gray-500">
+                              Are you sure you would like to do this?
+                            </p>
+                          </div>
+                        </div>
+
+                        <div class="space-y-2">
+                          <div aria-hidden="true" class="border-t dark:border-gray-700 px-2"></div>
+
+                          <div class="px-6 py-2">
+                            <div class="grid gap-2 grid-cols-[repeat(auto-fit,minmax(0,1fr))]">
+                              <button (click)="closeModal()"
+                                      class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset dark:focus:ring-offset-0 min-h-[2.25rem] px-4 text-sm text-gray-800 bg-white border-gray-300 hover:bg-gray-50 focus:ring-primary-600 focus:text-primary-600 focus:bg-primary-50 focus:border-primary-600 dark:bg-gray-800 dark:hover:bg-gray-700 dark:border-gray-600 dark:hover:border-gray-500 dark:text-gray-200 dark:focus:text-primary-400 dark:focus:border-primary-400 dark:focus:bg-gray-800">
+                                <span class="flex items-center gap-1">
+                                    <span class="">
+                                        Cancel
+                                    </span>
+                                </span>
+                              </button>
+
+                              <button (click)="deleteProduct(product.id)"
+                                      class="inline-flex items-center justify-center py-1 gap-1 font-medium rounded-lg border transition-colors outline-none focus:ring-offset-2 focus:ring-2 focus:ring-inset dark:focus:ring-offset-0 min-h-[2.25rem] px-4 text-sm text-white shadow focus:ring-white border-transparent bg-red-600 hover:bg-red-500 focus:bg-red-700 focus:ring-offset-red-700">
+
+                                <span class="flex items-center gap-1">
+                                    <span class="">
+                                        Confirm
+                                    </span>
+                                </span>
+
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
+
+                      </div>
+                    </div>
+                  </div>
+                </ng-container>
+              </tr>
+
+
+            </ng-container>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+          <div class="flex items-center justify-between flex-col sm:flex-row">
+            <div class="mb-4 sm:mb-0">
+              <p class="text-sm text-gray-700">
+                Showing <span class="font-medium">{{ products.data?.pageNumber }}</span> to <span
+                class="font-medium">{{ products.data?.totalPages }}</span> of <span
+                class="font-medium">{{ products.data?.totalElements }}</span> results
+              </p>
+            </div>
+            <div>
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <a (click)="previousPage()" [ngClass]="products.data?.hasPreviousPage?'text-indigo-600':''"
+                   class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">Previous</span>
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                       aria-hidden="true">
+                    <path fill-rule="evenodd"
+                          d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"
+                          clip-rule="evenodd"/>
+                  </svg>
+                </a>
+
+
+                <a href="#"
+                   class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                  {{ products.data?.pageNumber }}
+                </a>
+                <button (click)="nextPage()" [disabled]="!products.data?.hasNextPage"
+                        [ngClass]="products.data?.hasNextPage?'text-indigo-600':''"
+                        class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">Next</span>
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor"
+                       aria-hidden="true">
+                    <path fill-rule="evenodd"
+                          d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
+                          clip-rule="evenodd"/>
+                  </svg>
+                </button>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</ng-container>

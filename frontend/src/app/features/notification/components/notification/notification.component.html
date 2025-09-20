@@ -1,0 +1,4 @@
+<div *ngIf="notification$ | async as message" class="fixed bottom-6 right-6 z-[1000] flex items-center gap-6 rounded-md bg-primary p-6 text-white shadow-lg">
+  <p>{{ message }}</p>
+  <span class="close-btn" (click)="closeNotification()"><sup>X</sup></span>
+</div>

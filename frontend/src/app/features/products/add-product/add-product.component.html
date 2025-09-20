@@ -1,0 +1,130 @@
+<div class="bg-white border border-4 rounded-lg shadow relative m-10">
+
+  <div class="flex items-start justify-between p-5 border-b rounded-t">
+    <h3 class="text-xl font-semibold">
+      add product
+    </h3>
+    <button type="button"
+            class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm p-1.5 ml-auto inline-flex items-center"
+            data-modal-toggle="product-modal">
+      <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd"
+              d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+              clip-rule="evenodd"></path>
+      </svg>
+    </button>
+  </div>
+
+  <div class="p-6 space-y-6">
+    <form [formGroup]="productForm" (submit)="addProduct()">
+      <div class="grid grid-cols-6 gap-6">
+        <div class="col-span-6 sm:col-span-3">
+          <label for="product-name" class="text-sm font-medium text-gray-900 block mb-2">Product Name</label>
+          <input type="text" name="name" [formControl]="f.name" id="product-name"
+                 class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+                 required="">
+          <div>
+            <ng-container *ngIf="name?.touched && productForm.invalid">
+              <div *ngIf="name?.errors?.['required'] " class="text-red-600 text-sm mt-1">
+                Product name is required .
+              </div>
+              <div *ngIf="name?.errors?.['minlength'] " class="text-red-600 text-sm mt-1">
+                Min carecters is 3.
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <div class="col-span-6 sm:col-span-3">
+          <label for="category" class="text-sm font-medium text-gray-900 block mb-2">Category</label>
+
+          <select id="category" [formControl]="f.category" (change)="categoryChange()"
+                  class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5">
+
+            <option [value]="null" disabled>Select a category</option>
+
+            <option [selected]="categoryId==category.id" *ngFor="let category of categories" [value]="category.id">
+              {{ category.name }}
+            </option>
+
+          </select>
+          <ng-container *ngIf="category?.touched">
+            <div *ngIf="category?.errors?.['required'] " class="text-red-600 text-sm mt-1">
+              Product Category is required .
+            </div>
+          </ng-container>
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+          <label for="brand" class="text-sm font-medium text-gray-900 block mb-2">Quantity Stock</label>
+          <input type="number" name="quantityStock" id="brand" [formControl]="f.quantityStock"
+                 class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+                 required="">
+          <ng-container *ngIf="f.quantityStock?.touched">
+            <div *ngIf="quantityStock?.errors?.['required'] " class="text-red-600 text-sm mt-1">
+              Product Quantity is required .
+            </div>
+            <div *ngIf="quantityStock?.errors?.['min'] " class="text-red-600 text-sm mt-1">
+              Min Quantity is 1.
+            </div>
+          </ng-container>
+        </div>
+        <div class="col-span-6 sm:col-span-3">
+          <label for="price" class="text-sm font-medium text-gray-900 block mb-2">Price</label>
+          <input type="number" name="price" formControlName="price" id="price"
+                 class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+                 required="">
+          <ng-container *ngIf="price?.touched">
+            <div *ngIf="price?.errors?.['required'] " class="text-red-600 text-sm mt-1">
+              Product Price is required .
+            </div>
+            <div *ngIf="price?.errors?.['min'] " class="text-red-600 text-sm mt-1">
+              Min Price is 1$.
+            </div>
+          </ng-container>
+        </div>
+        <div class="col-span-12 sm:col-span-6">
+          <label for="image" class="text-sm font-medium text-gray-900 block mb-2">Image</label>
+          <input
+            type="file"
+            id="image"
+            (change)="onFileSelected($event)"
+            [formControl]="f.image"
+            class="shadow-sm bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-2.5"
+          >
+          <ng-container *ngIf="image?.touched">
+            <div *ngIf="image?.errors?.['required'] " class="text-red-600 text-sm mt-1">
+              Product Image is required .
+            </div>
+
+          </ng-container>
+        </div>
+        <div class="col-span-full">
+          <label for="product-details" class="text-sm font-medium text-gray-900 block mb-2">Product Details</label>
+          <textarea id="product-details" rows="6" formControlName="description"
+                    class="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm rounded-lg focus:ring-cyan-600 focus:border-cyan-600 block w-full p-4"
+                    placeholder="Details"></textarea>
+          <ng-container *ngIf="description?.touched">
+            <div *ngIf="description?.errors?.['required'] " class="text-red-600 text-sm mt-1">
+              Product Quantity is required .
+            </div>
+            <div *ngIf="description?.errors?.['minlength'] " class="text-red-600 text-sm mt-1">
+              Min Carecters is 10.
+            </div>
+          </ng-container>
+        </div>
+      </div>
+      <div class="p-6 border-t border-gray-200 rounded-b">
+        <button [disabled]="productForm.invalid"
+                class="text-white bg-primary  focus:ring-4 focus:ring-cyan-200 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
+                type="submit">Save
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="isLoading" class="w-full h-full fixed top-0 left-0 bg-white opacity-75 z-50">
+    <div class="flex justify-center items-center mt-[50vh]">
+      <div class="fas fa-circle-notch fa-spin fa-5x text-violet-600">Loading</div>
+    </div>
+  </div>
+</div>
